@@ -2,13 +2,16 @@ import * as Core                                 from './core'
 import {getFeeContract, getEncodedFeeData}       from './contracts/fee'
 import {getFilterContract, getEncodedFilterData} from './contracts/filter'
 import {getKycContract, getEncodedKycData}       from './contracts/kyc'
+import {defineReadOnly} from './helpers/utils'
 import Logger                                    from './helpers/logger'
+import {wordlists} from 'bip39'
+console.log('wordlists', wordlists)
 import {
   CONTRACT_ADDRESS,
   DEFAULT_GAS_LIMIT,
   DEFAULT_KYC_VALUE,
   SEPARATOR,
-  ENTRYPOINT_NODE_ADDR
+  ENTRYPOINT_NODE_ADDRESS
 }                                                from './helpers/config'
 
 import Web3 from 'web3'
@@ -17,14 +20,10 @@ const utils = Web3.utils
 
 Logger.init({env: 'dev', logLevel: 'error'})
 
-export function defineReadOnly(object, name, value) {
-  Object.defineProperty(object, name, {
-    value: value,
-    writable: false,
-    enumerable: true,
-    configurable: false
-  })
-}
+/**
+ * Class Wallet
+ * @class
+ */
 
 export class Wallet {
   _mnemonic = () => null
@@ -34,8 +33,12 @@ export class Wallet {
   kycContract = null
   filterContract = null
   
+  /**
+   * Creating a Wallet instance
+   * @param {string} nodeUrl - Url of a Graphite http provider
+   */
   constructor(nodeUrl) {
-    this.web3 = nodeUrl ? new Web3(nodeUrl) : null
+    this.web3 = nodeUrl ? new Web3(new Web3.providers.HttpProvider(nodeUrl)) : null
     this.provider = this.web3 ? this.web3.eth : null
     this.address = null
   }
@@ -66,6 +69,9 @@ export class Wallet {
     return this
   }
   
+  /**
+   * Generate a random mnemonic
+   */
   createRandom(wordCount) {
     const mnemonic = Core.generateNewMnemonic(wordCount)
     this.fromMnemonic(mnemonic)
@@ -86,21 +92,21 @@ export class Wallet {
     this.kycContract = getKycContract(this.web3)
   }
   
-  async signTransaction({to, gasLimit, gasPrice, value, data}) {
-    const nonce = await this.provider.getTransactionCount(this.address)
+  async signTransaction({to, gasLimit, gasPrice, gas, nonce, value, data}) {
     let txData
     
     if (data) {
-      txData = SEPARATOR.concat(utils.hexToBytes(ENTRYPOINT_NODE_ADDR)).concat(utils.hexToBytes(data))
+      txData = SEPARATOR.concat(utils.hexToBytes(ENTRYPOINT_NODE_ADDRESS)).concat(utils.hexToBytes(data))
     } else {
-      txData = SEPARATOR.concat(utils.hexToBytes(ENTRYPOINT_NODE_ADDR))
+      txData = SEPARATOR.concat(utils.hexToBytes(ENTRYPOINT_NODE_ADDRESS))
     }
-  
+    
     const transaction = await this.provider.accounts.signTransaction(
       {
         from: this.address,
-        gasLimit: utils.numberToHex(gasLimit),
-        gasPrice: utils.numberToHex(gasPrice),
+        gas: gas ? utils.numberToHex(gas) : '',
+        gasLimit: gasLimit ? utils.numberToHex(gasLimit) : '',
+        gasPrice: gasPrice ? utils.numberToHex(gasPrice) : '',
         data: utils.bytesToHex(txData),
         value,
         to,
@@ -121,7 +127,8 @@ export class Wallet {
   async sendTransaction(rawTx) {
     try {
       return this.provider.sendSignedTransaction(rawTx)
-    } catch (e) {
+    }
+    catch (e) {
       Logger.throwArgumentError(e.message, 'rawTx', rawTx)
     }
   }
@@ -205,6 +212,22 @@ export class Wallet {
     return this.kycContract.methods.level(this.address).call()
   }
   
+  async viewMyLastKycRequest() {
+    if (!this.kycContract) {
+      this.createContracts()
+    }
+    
+    return this.kycContract.methods.viewMyLastRequest().call({from: this.address})
+  }
+  
+  async repairLostKycRequest() {
+    if (!this.kycContract) {
+      this.createContracts()
+    }
+    
+    return this.kycContract.methods.repairLostRequest().call({from: this.address})
+  }
+  
   async updateKycLevel(newLevel = 0) {
     if (!Number.isInteger(newLevel)) {
       Logger.throwArgumentError('The newLevel must be an integer', 'newLevel', newLevel)
@@ -234,7 +257,7 @@ export class Wallet {
       },
       this.privateKey
     )
-  
+    
     return this.sendTransaction(transaction.rawTransaction)
   }
 }

@@ -1,5 +1,5 @@
 import ABI                                                 from './abi/filter_contract.json'
-import {CONTRACT_ADDRESS, ENTRYPOINT_NODE_ADDR, SEPARATOR} from '../helpers/config'
+import {CONTRACT_ADDRESS, ENTRYPOINT_NODE_ADDRESS, SEPARATOR} from '../helpers/config'
 import Logger                                              from '../helpers/logger'
 import Web3   from 'web3'
 
@@ -19,7 +19,7 @@ export function getEncodedFilterData(contract, newLevel = 0) {
   }
   
   const encoded = contract.methods.setFilterLevel(newLevel).encodeABI()
-  const data = SEPARATOR.concat(utils.hexToBytes(ENTRYPOINT_NODE_ADDR)).concat(utils.hexToBytes(encoded))
+  const data = SEPARATOR.concat(utils.hexToBytes(ENTRYPOINT_NODE_ADDRESS)).concat(utils.hexToBytes(encoded))
 
   return utils.bytesToHex(data)
 }

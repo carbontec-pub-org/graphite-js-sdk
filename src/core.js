@@ -1,4 +1,4 @@
-import {generateMnemonic, validateMnemonic, mnemonicToSeedSync} from 'bip39'
+import {generateMnemonic, validateMnemonic, mnemonicToSeedSync, wordlists} from 'bip39'
 import {fromMasterSeed}                                         from 'hdkey'
 import {Address, privateToPublic}                               from 'ethereumjs-util'
 import Web3                                                     from 'web3'
@@ -7,7 +7,13 @@ import Logger                                                   from './helpers/
 Logger.init({env: 'dev', logLevel: 'error'})
 const PATH = `m/44'/60'/0'/0/0`
 
-export function generateNewMnemonic(wordCount = 15) {
+/**
+ * Generates a new mnemonic for a given number of words.
+ * By default, 15 words.
+ * @param {number} wordsCount - Available options are 12, 15, 18, 21 or 24 words.
+ * @returns {string} Mnemonic phrase
+ */
+export function generateNewMnemonic(wordsCount = 15) {
   const bitsOfEntropy = {
     12: 128,
     15: 160,
@@ -16,18 +22,27 @@ export function generateNewMnemonic(wordCount = 15) {
     24: 256
   }
   
-  if (!bitsOfEntropy.hasOwnProperty(+wordCount)) {
-    Logger.throwArgumentError('Invalid words count', 'wordsCount', wordCount)
+  if (!bitsOfEntropy.hasOwnProperty(+wordsCount)) {
+    Logger.throwArgumentError('Invalid count of words', 'wordsCount', wordsCount)
   }
   
   try {
-    return generateMnemonic(bitsOfEntropy[wordCount])
+    return generateMnemonic(bitsOfEntropy[wordsCount])
   }
   catch (e) {
     Logger.throwError(e.message, Logger.errors.BAD_MNEMONIC)
   }
 }
 
+/**
+ * Returns the necessary information about the Graphite wallet by the mnemonic
+ * @param {string} mnemonic - Mnemonic phrase
+ * @returns {Object} wallet instance
+ * @returns {string} wallet.mnemonic - Mnemonic phrase
+ * @returns {string} wallet.address - Graphite address
+ * @returns {string} wallet.privateKey - Graphite private key
+ * @returns {string} wallet.publicKey - Graphite public key
+ */
 export function getWalletFromMnemonic(mnemonic) {
   try {
     mnemonic = mnemonic?.toLowerCase()
@@ -53,6 +68,14 @@ export function getWalletFromMnemonic(mnemonic) {
   }
 }
 
+/**
+ * Returns the necessary information about a Graphite wallet by the private key
+ * @param {string} privateKey - Graphite private key
+ * @returns {Object} wallet instance
+ * @returns {string} wallet.address - Graphite address
+ * @returns {string} wallet.privateKey - Graphite private key
+ * @returns {string} wallet.publicKey - Graphite public key
+ */
 export function getWalletFromKey(privateKey = '') {
   if (!privateKey) {
     Logger.throwArgumentError(Logger.errors.INVALID_ARGUMENT, 'privateKey', privateKey)
@@ -82,6 +105,11 @@ export function getWalletFromKey(privateKey = '') {
   }
 }
 
+/**
+ * Returns a Graphite address by the public key
+ * @param {Buffer} publicKey - Graphite public key
+ * @returns {string} address - Graphite address
+ */
 export function getAddressFromPublicKey(publicKey) {
   try {
     const address = Address.fromPublicKey(publicKey)

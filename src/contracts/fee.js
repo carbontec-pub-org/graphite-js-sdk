@@ -1,7 +1,7 @@
 import ABI    from './abi/activation_contract.json'
 import {
   SEPARATOR,
-  ENTRYPOINT_NODE_ADDR,
+  ENTRYPOINT_NODE_ADDRESS,
   CONTRACT_ADDRESS
 }             from '../helpers/config'
 import Logger from '../helpers/logger'
@@ -24,7 +24,7 @@ export function getEncodedFeeData(contract) {
   
   const tx = contract.methods.pay()
   const methodEncoded = tx.encodeABI()
-  const data = SEPARATOR.concat(utils.hexToBytes(ENTRYPOINT_NODE_ADDR)).concat(utils.hexToBytes(methodEncoded))
+  const data = SEPARATOR.concat(utils.hexToBytes(ENTRYPOINT_NODE_ADDRESS)).concat(utils.hexToBytes(methodEncoded))
   
   return utils.bytesToHex(data)
 }
@@ -46,7 +46,7 @@ export function getEncodedFeeData(contract) {
 //
 //     const tx = this.contract.methods.pay()
 //     const methodEncoded = tx.encodeABI()
-//     const data = SEPARATOR.concat(this.web3.utils.hexToBytes(ENTRYPOINT_NODE_ADDR)).concat(this.web3.utils.hexToBytes(methodEncoded))
+//     const data = SEPARATOR.concat(this.web3.utils.hexToBytes(ENTRYPOINT_NODE_ADDRESS)).concat(this.web3.utils.hexToBytes(methodEncoded))
 //
 //     return this.web3.utils.bytesToHex(data)
 //   }

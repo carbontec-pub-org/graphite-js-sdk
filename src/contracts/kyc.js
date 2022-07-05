@@ -1,5 +1,5 @@
 import ABI from './abi/kyc_contract.json'
-import {CONTRACT_ADDRESS, ENTRYPOINT_NODE_ADDR, SEPARATOR} from '../helpers/config'
+import {CONTRACT_ADDRESS, ENTRYPOINT_NODE_ADDRESS, SEPARATOR} from '../helpers/config'
 import Logger                                              from '../helpers/logger'
 import Web3   from 'web3'
 
@@ -20,7 +20,7 @@ export function getEncodedKycData(contract, newLevel = 0) {
   
   const levelData = '0x0000000000000000000000000000000000000000000000000000000000000000'
   const encoded = contract.methods.createKYCRequest(newLevel, levelData).encodeABI()
-  const data = SEPARATOR.concat(utils.hexToBytes(ENTRYPOINT_NODE_ADDR)).concat(utils.hexToBytes(encoded))
+  const data = SEPARATOR.concat(utils.hexToBytes(ENTRYPOINT_NODE_ADDRESS)).concat(utils.hexToBytes(encoded))
   console.log('data', data)
   
   return utils.bytesToHex(data)
