@@ -29,8 +29,7 @@ To create a new Wallet you need to call `createRandom` method. Default word coun
 ```js
 import {Wallet} from 'graphite-lib'
 
-const nodeUrl = '...' // Url for connecting to Graphite network
-const wallet = new Wallet(nodeUrl)
+const wallet = new Wallet()
 const wordCount = 21
 wallet.createRandom(wordCount) // Takes values equal to 12, 15, 18, 21 or 24
 // => {
@@ -41,11 +40,16 @@ wallet.createRandom(wordCount) // Takes values equal to 12, 15, 18, 21 or 24
 //   provider // web3 provider
 // }
 ```
+You can connect to your own node using method `.connect()`. Only non-anonymous nodes are allowed.
+```js
+const nodeUrl = 'http://...'
+wallet.connect(nodeUrl)
+```
 
 You can also import wallet from a mnemonic or a Graphite private key.
 
 ```js
-const wallet = new Wallet(nodeUrl)
+const wallet = new Wallet()
 const mnemonic = 'kite pencil ...'
 wallet.fromMnemonic(mnemonic)
 
@@ -58,11 +62,13 @@ wallet.fromPrivateKey(privateKey)
 ## Sending transaction
 
 ```js
- const rawTx = await wallet.signTransaction({
+const nonce = await wallet.provider.getTransactionCount(wallet.address)
+const rawTx = await wallet.signTransaction({
   to: '0x5e2FE9Fda4cd5F6F...',
   gasLimit: 300000,
   gasPrice: 20000000000,
-  value: 10000000000000000000
+  value: 10000000000000000000,
+  nonce
 })
 // => '0xf8840a8504a817c800830493e0945e2fe9fda4cd5f6f...'
 
@@ -80,16 +86,18 @@ const tx = await wallet.signAndSendTransaction({
   to: '0x5e2FE9Fda4cd5F6F...',
   gasLimit: 300000,
   gasPrice: 20000000000,
-  value: 10000000000000000000
+  value: 10000000000000000000,
+  nonce
 })
 ```
 
 ## Provider
 
-If you specify the `nodeUrl` when creating the class, the provider will be available to you to access the network. Based on
-web3 provider.
+When creating a class, the provider will be available to you to access the network. Based
+on web3 provider.
+    
 ```js
-const wallet = new Wallet(nodeUrl)
+const wallet = new Wallet()
 
 await wallet.provider.getBlockNumber() // => 4718
 await wallet.provider.getGasPrice() // => '20000000000'
@@ -107,7 +115,9 @@ wallet.createContracts()
 ```
 
 ### Account activation
+
 To activate the account, the wallet must have funds. Gas limit for account activation is 300000 Gwei.
+
 ```js
 const status = await wallet.getActivationStatus()
 // > false - account is not activated
@@ -116,45 +126,61 @@ const status = await wallet.getActivationStatus()
 const tx = await wallet.activateAccount()
 // Will return the transaction upon successful activation
 ```
-### Filters 
+
+### Filters
+
 To get current filter level, use `.getFilterLevel()`.
 ```js
 const level = await wallet.getFilterLevel()
 // > 0
 ```
+
 To change filter level, use .updateFilterLevel(newLevel)
 ```js
 const tx = await wallet.updateFilterLevel(1)
 ```
 
-### KYC 
+### KYC
+
 To get current KYC level, use `.getKycLevel()`.
 ```js
 const level = await wallet.getKycLevel()
 // > 0
 ```
-To change filter level, use .updateKycLevel(newLevel)
+
+To change filter level, use `.updateKycLevel(newLevel)`
 ```js
 const tx = await wallet.updateKycLevel(1)
 ```
+
+To get the last request, call the method `.viewMyLastKycRequest()`
+```js
+const lastRequest = await wallet.viewMyLastKycRequest()
+```
+
 ## Re-Exports
 
 - [web3 utils](https://github.com/ChainSafe/web3.js)
 
 ## Tests
+
 ```console
 $ npm run test
 ```
 
 ## Dev installation
+
 Download this repository. On command line, type in the following commands:
+
 ```console
 $ cd graphite-lib
 $ npm i
 $ npm run build
 $ npm link 
 ```
+
 Go to a necessary project. Add a graphite-lib like a local dependency:
+
 ```console
 $ cd another-project
 $ npm link 'graphite-lib'

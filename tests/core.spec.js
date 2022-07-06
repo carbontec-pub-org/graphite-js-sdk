@@ -45,7 +45,7 @@ describe('Core', () => {
       const mnemonic = generateNewMnemonic(14)
     }
     catch (e) {
-      expect(e.message).toContain('Invalid words count')
+      expect(e.message).toContain('Invalid count of words')
     }
   })
   

@@ -29,32 +29,3 @@ export function getEncodedFeeData(contract) {
   return utils.bytesToHex(data)
 }
 
-//
-// export class FeeContract {
-//   constructor(web3) {
-//     this.web3 = web3
-//     this.contract = null
-//     this.#createContract()
-//   }
-//
-//   #createContract() {
-//     this.contract = new this.web3.eth.Contract(ABI, CONTRACT_ADDRESS.FEE)
-//   }
-//
-//   getEncodedFeeData() {
-//     if (!this.contract) this.#createContract()
-//
-//     const tx = this.contract.methods.pay()
-//     const methodEncoded = tx.encodeABI()
-//     const data = SEPARATOR.concat(this.web3.utils.hexToBytes(ENTRYPOINT_NODE_ADDRESS)).concat(this.web3.utils.hexToBytes(methodEncoded))
-//
-//     return this.web3.utils.bytesToHex(data)
-//   }
-//
-//   async checkAccountActivation(address) {
-//     if (!this.contract) this.#createContract()
-//
-//     return await this.contract.methods.paidFee(address).call()
-//   }
-// }
-

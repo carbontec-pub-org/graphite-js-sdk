@@ -1,4 +1,4 @@
-import {generateMnemonic, validateMnemonic, mnemonicToSeedSync, wordlists} from 'bip39'
+import {generateMnemonic, validateMnemonic, mnemonicToSeedSync} from 'bip39'
 import {fromMasterSeed}                                         from 'hdkey'
 import {Address, privateToPublic}                               from 'ethereumjs-util'
 import Web3                                                     from 'web3'
@@ -11,7 +11,7 @@ const PATH = `m/44'/60'/0'/0/0`
  * Generates a new mnemonic for a given number of words.
  * By default, 15 words.
  * @param {number} wordsCount - Available options are 12, 15, 18, 21 or 24 words.
- * @returns {string} Mnemonic phrase
+ * @returns {string} Mnemonic phrase.
  */
 export function generateNewMnemonic(wordsCount = 15) {
   const bitsOfEntropy = {
@@ -35,13 +35,13 @@ export function generateNewMnemonic(wordsCount = 15) {
 }
 
 /**
- * Returns the necessary information about the Graphite wallet by the mnemonic
- * @param {string} mnemonic - Mnemonic phrase
+ * Returns the necessary information about the Graphite wallet by the mnemonic.
+ * @param {string} mnemonic - Mnemonic phrase.
  * @returns {Object} wallet instance
- * @returns {string} wallet.mnemonic - Mnemonic phrase
- * @returns {string} wallet.address - Graphite address
- * @returns {string} wallet.privateKey - Graphite private key
- * @returns {string} wallet.publicKey - Graphite public key
+ * @returns {string} wallet.mnemonic - Mnemonic phrase.
+ * @returns {string} wallet.address - Graphite address.
+ * @returns {string} wallet.privateKey - Graphite private key.
+ * @returns {string} wallet.publicKey - Graphite public key.
  */
 export function getWalletFromMnemonic(mnemonic) {
   try {
@@ -69,12 +69,12 @@ export function getWalletFromMnemonic(mnemonic) {
 }
 
 /**
- * Returns the necessary information about a Graphite wallet by the private key
- * @param {string} privateKey - Graphite private key
+ * Returns the necessary information about a Graphite wallet by the private key.
+ * @param {string} privateKey - Graphite private key.
  * @returns {Object} wallet instance
- * @returns {string} wallet.address - Graphite address
- * @returns {string} wallet.privateKey - Graphite private key
- * @returns {string} wallet.publicKey - Graphite public key
+ * @returns {string} wallet.address - Graphite address.
+ * @returns {string} wallet.privateKey - Graphite private key.
+ * @returns {string} wallet.publicKey - Graphite public key.
  */
 export function getWalletFromKey(privateKey = '') {
   if (!privateKey) {
@@ -106,9 +106,9 @@ export function getWalletFromKey(privateKey = '') {
 }
 
 /**
- * Returns a Graphite address by the public key
- * @param {Buffer} publicKey - Graphite public key
- * @returns {string} address - Graphite address
+ * Returns a Graphite address by the public key.
+ * @param {Buffer} publicKey - Graphite public key.
+ * @returns {string} address - Graphite address.
  */
 export function getAddressFromPublicKey(publicKey) {
   try {
