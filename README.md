@@ -148,7 +148,7 @@ const level = await wallet.getKycLevel()
 // > 0
 ```
 
-To change filter level, use `.updateKycLevel(newLevel)`
+To change KYC level, use `.updateKycLevel(newLevel)`
 ```js
 const tx = await wallet.updateKycLevel(1)
 ```
